@@ -6,7 +6,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.Instant;
 import java.util.UUID;
 
 @AllArgsConstructor
@@ -24,9 +23,5 @@ public class RankinEntity {
     @OneToOne(fetch = FetchType.LAZY)
     @MapsId
     private GroupRegistrationEntity groupRegistrationEntity;
-
     private boolean isGoalReached;
-    private String periodOfChallenge;
-    private Instant challengeStartDate;
-    private Instant challengeEndDate;
 }
