@@ -15,4 +15,6 @@ public interface GroupRegisterRepository extends JpaRepository<GroupRegistration
             value = "select * from group_registration where group_id in (:groupIds)",
             nativeQuery = true)
     List<GroupRegistrationEntity> findAllByGroupId(List<UUID> groupIds);
+
+    List<GroupRegistrationEntity> findByGroupId(UUID id);
 }

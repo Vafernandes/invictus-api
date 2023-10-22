@@ -7,7 +7,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.Instant;
-import java.util.List;
 import java.util.UUID;
 
 @AllArgsConstructor
@@ -22,14 +21,15 @@ public class GroupRegistrationEntity {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "participant_id")
     private ParticipantEntity participant;
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "group_id")
     private GroupEntity group;
 
     private Instant registrationDate;
+    private boolean owner;
     private Instant updatedDate;
 
 }

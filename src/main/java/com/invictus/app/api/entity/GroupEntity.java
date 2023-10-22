@@ -27,8 +27,6 @@ public class GroupEntity {
     @OneToMany(mappedBy = "group", fetch = FetchType.EAGER)
     private List<GroupRegistrationEntity> groupRegistrations;
     private String periodOfChallenge;
-    private Instant challengeStartDate;
-    private Instant challengeEndDate;
     private Instant creationDate;
     private Instant updatedDate;
 }

@@ -22,6 +22,7 @@ public class ParticipantEntity {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
     private String name;
+    private String email;
     @OneToMany(mappedBy = "participant", fetch = FetchType.EAGER)
     private List<GroupRegistrationEntity> groupRegistrationEntities;
     private Instant creationDate;

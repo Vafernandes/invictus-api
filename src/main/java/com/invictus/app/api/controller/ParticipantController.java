@@ -1,9 +1,8 @@
 package com.invictus.app.api.controller;
 
-import com.invictus.app.api.dto.participant.ParticipantRequestDto;
 import com.invictus.app.api.dto.participant.ParticipantResponseDto;
+import com.invictus.app.api.dto.participant.ParticipantSaveRequestDto;
 import com.invictus.app.api.service.ParticipantService;
-import jakarta.websocket.server.PathParam;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -13,14 +12,14 @@ import java.util.UUID;
 @RequestMapping(value = "participants")
 public class ParticipantController {
 
-    private ParticipantService participantService;
+    private final ParticipantService participantService;
 
     public ParticipantController(ParticipantService participantService) {
         this.participantService = participantService;
     }
 
     @PostMapping
-    public ParticipantResponseDto save(@RequestBody ParticipantRequestDto participantRequestDto) {
+    public ParticipantResponseDto save(@RequestBody ParticipantSaveRequestDto participantRequestDto) {
         return participantService.save(participantRequestDto);
     }
 
