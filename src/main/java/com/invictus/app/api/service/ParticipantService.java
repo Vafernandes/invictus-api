@@ -3,8 +3,9 @@ package com.invictus.app.api.service;
 import com.invictus.app.api.dto.participant.ParticipantRequestDto;
 import com.invictus.app.api.dto.participant.ParticipantResponseDto;
 import com.invictus.app.api.dto.participant.ParticipantSaveRequestDto;
-import com.invictus.app.api.entity.GroupEntity;
+import com.invictus.app.api.entity.GroupRegistrationEntity;
 import com.invictus.app.api.handler.models.NotFoundExceptionCustom;
+import com.invictus.app.api.handler.models.RuleExceptionCustom;
 import com.invictus.app.api.mapstruct.GroupMapper;
 import com.invictus.app.api.mapstruct.ParticipantMapper;
 import com.invictus.app.api.repository.GroupRepository;
@@ -38,21 +39,11 @@ public class ParticipantService {
         var participantEntity = participantMapper.toEntity(requestDto);
 
         if(Objects.isNull(requestDto.getGroup()))
-            participantMapper.toResponse(participantRepository.save(participantEntity));
+            return participantMapper.toResponse(participantRepository.save(participantEntity));
 
         var groupEntity = groupMapper.toEntity(requestDto.getGroup());
         var groupRegistration = groupRegistrationService.save(participantEntity, groupEntity);
         return participantMapper.toResponse(groupRegistration.getParticipant());
-    }
-
-    public List<GroupEntity> registerGroup(List<UUID> groupsUuids) {
-        var groups = groupRepository.findAllById(groupsUuids);
-
-        if (groups.isEmpty()) {
-            throw new NotFoundExceptionCustom("Group not found");
-        }
-
-        return groups;
     }
 
     public List<ParticipantResponseDto> findAll() {
@@ -67,31 +58,24 @@ public class ParticipantService {
         return participantMapper.toResponse(participantEntity.get());
     }
 
-    public ParticipantResponseDto update(ParticipantRequestDto requestDto) {
-        var entity = participantMapper.toEntity(requestDto);
+    @Transactional
+    public void joinGroup(ParticipantRequestDto requestDto) {
+        var groupEntityList = groupRepository.findAllById(requestDto.getGroupIds());
 
-//        if (Objects.nonNull(requestDto.getGroupIds())) {
-//            var groups = registerGroup(requestDto.getGroupIds());
-//
-//            entity.setCreationDate(Instant.now());
-//            entity.setUpdatedDate(Instant.now());
-//            var participant = participantRepository.save(entity);
-//
-//            List<GroupRegistrationEntity> registerList = groups.stream().map(group ->
-//                    GroupRegistrationEntity.builder()
-//                            .group(group)
-//                            .participant(participant)
-//                            .registrationDate(Instant.now())
-//                            .updatedDate(Instant.now())
-//                            .build()
-//            ).toList();
-//
-//            var registrationEntityList = groupRegisterRepository.saveAll(registerList);
-//
-//            participant.setGroupRegistrationEntities(registrationEntityList);
-//            return participantMapper.toResponse(participant);
-//        }
+        if (groupEntityList.isEmpty())
+            throw new NotFoundExceptionCustom("Groups with ids not found");
 
-        return participantMapper.toResponse(participantRepository.save(entity));
+        var participantEntity = participantRepository.findById(requestDto.getId());
+
+        if(participantEntity.isEmpty())
+            throw new NotFoundExceptionCustom(String.format("Participant id=%s not found!", requestDto.getId()));
+
+        groupEntityList.forEach(group -> {
+            var isParticipantRegistered = group.getGroupRegistrations().stream().map(GroupRegistrationEntity::getParticipant)
+                    .anyMatch(participantId -> participantId.getId().equals(requestDto.getId()));
+
+            if(isParticipantRegistered) throw new RuleExceptionCustom("Participant with id=%s already exists in this group");
+            groupRegistrationService.save(participantEntity.get(), group);
+        });
     }
 }

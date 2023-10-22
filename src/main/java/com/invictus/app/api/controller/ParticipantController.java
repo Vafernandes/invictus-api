@@ -1,8 +1,10 @@
 package com.invictus.app.api.controller;
 
+import com.invictus.app.api.dto.participant.ParticipantRequestDto;
 import com.invictus.app.api.dto.participant.ParticipantResponseDto;
 import com.invictus.app.api.dto.participant.ParticipantSaveRequestDto;
 import com.invictus.app.api.service.ParticipantService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,8 +21,8 @@ public class ParticipantController {
     }
 
     @PostMapping
-    public ParticipantResponseDto save(@RequestBody ParticipantSaveRequestDto participantRequestDto) {
-        return participantService.save(participantRequestDto);
+    public ParticipantResponseDto save(@RequestBody ParticipantSaveRequestDto requestDto) {
+        return participantService.save(requestDto);
     }
 
     @GetMapping
@@ -31,5 +33,12 @@ public class ParticipantController {
     @GetMapping("/{id}")
     public ParticipantResponseDto findById(@PathVariable UUID id) {
         return participantService.findById(id);
+    }
+
+    @PostMapping("/{id}")
+    public ResponseEntity<Void> joinGroup(@RequestBody ParticipantRequestDto requestDto, @PathVariable UUID id) {
+        requestDto.setId(id);
+        participantService.joinGroup(requestDto);
+        return ResponseEntity.ok().build();
     }
 }
