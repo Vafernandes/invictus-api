@@ -1,4 +1,4 @@
-## Invicts app api
+## Invictus app api
 
 OBS: Antes de iniciar o projeto, execute o segunite comando:
  - mvn clean install
